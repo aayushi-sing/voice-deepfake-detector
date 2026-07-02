@@ -28,7 +28,7 @@ LABEL_NAMES = {LABEL_REAL: "REAL", LABEL_FAKE: "FAKE"}
 
 # --- Training ---
 BATCH_SIZE = 32
-LEARNING_RATE = 1e-3
+LEARNING_RATE = 5e-4   # lowered from 1e-3 after Experiment 2 showed loss-spike instability
 NUM_EPOCHS = 20
 VAL_SPLIT = 0.15
 RANDOM_SEED = 42

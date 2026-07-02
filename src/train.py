@@ -46,7 +46,15 @@ def get_device():
     return torch.device("cpu")
 
 
-def run_epoch_train(model, loader, optimizer, loss_fn, device):
+def run_epoch_train(model, loader, optimizer, loss_fn, device, max_grad_norm=1.0):
+    """
+    max_grad_norm: gradient clipping threshold. Without this, occasional large
+    gradients (common on small/noisy batches) can push weights into a bad
+    region and cause the loss spikes seen in early experiments (e.g. val_loss
+    jumping from 0.05 to 9.96 between epochs). Clipping caps the gradient's
+    L2 norm before the optimizer step, which smooths training without
+    changing what the model is capable of learning.
+    """
     model.train()
     total_loss = 0.0
     n_batches = 0
@@ -58,6 +66,7 @@ def run_epoch_train(model, loader, optimizer, loss_fn, device):
         logits = model(x)
         loss = loss_fn(logits, y)
         loss.backward()
+        torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=max_grad_norm)
         optimizer.step()
 
         total_loss += loss.item()
@@ -140,7 +149,8 @@ def train(args):
     for epoch in range(1, args.epochs + 1):
         t0 = time.time()
 
-        train_loss = run_epoch_train(model, train_loader, optimizer, loss_fn, device)
+        train_loss = run_epoch_train(model, train_loader, optimizer, loss_fn, device,
+                                      max_grad_norm=args.max_grad_norm)
         val_loss, val_report = run_epoch_eval(model, dev_loader, loss_fn, device)
 
         elapsed = time.time() - t0
@@ -204,6 +214,8 @@ def build_arg_parser():
     p.add_argument("--batch_size", type=int, default=config.BATCH_SIZE)
     p.add_argument("--lr", type=float, default=config.LEARNING_RATE)
     p.add_argument("--patience", type=int, default=3)
+    p.add_argument("--max_grad_norm", type=float, default=1.0,
+                    help="Gradient clipping threshold; stabilizes training against loss spikes")
     p.add_argument("--checkpoint_path", default=config.BEST_CHECKPOINT)
 
     return p
