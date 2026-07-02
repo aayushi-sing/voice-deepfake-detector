@@ -99,9 +99,7 @@ def main():
         Path(tmp_path).unlink(missing_ok=True)  # clean up temp file
 
     st.divider()
-    st.caption(
-        
-    )
+    
 
 
 if __name__ == "__main__":
