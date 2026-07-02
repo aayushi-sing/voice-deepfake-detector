@@ -6,8 +6,7 @@ Upload a .wav or .flac file, see the model's Real/Fake prediction, confidence,
 and the mel-spectrogram the model actually looked at. This is a thin UI layer
 over predict.py's predict_file() -- no logic is duplicated here.
 
-Run with:
-    streamlit run app.py
+
 """
 
 import tempfile
@@ -101,10 +100,7 @@ def main():
 
     st.divider()
     st.caption(
-        "Built for the IndiaAI Mission 'Real-Time Voice Deepfake Detection System' "
-        "project (IAI, TCG CREST / IIT Kharagpur). Model: CNN over log-mel "
-        "spectrograms, trained on ASVspoof2019 LA. Reported metrics (dev set): "
-        "see outputs/metrics_report.txt."
+        
     )
 
 
